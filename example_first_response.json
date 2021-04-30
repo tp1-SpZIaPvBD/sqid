@@ -1,0 +1,22 @@
+{
+    "searchinfo": {
+        "search": "CWE-129"
+    },
+    "search": [
+        {
+            "id": "Q11571",
+            "title": "CWE-129",
+            "url": "//www.wikidata.org/wiki/Q11572",
+            "concepturi": "http://www.wikidata.org/entity/Q11572",
+            "label": "Chleba s maslem a se salamem",
+            "description": "Jde chleba a povida chlebu s maslem AHA Ronaldo",
+            "match": {
+                "type": "label",
+                "language": "sk",
+                "text": "Trasiem sa ako Shakira v jej klipoch"
+            }
+        }
+    ],
+    "search-continue": 10,
+    "success": 0
+}

@@ -218,6 +218,7 @@ export function parseEntityId(entityId: string): EntityReference {
       kind = 'property'
       break
     case 'Q':
+    case 'C':
       kind = 'item'
       break
     case 'L':
@@ -308,8 +309,31 @@ export async function searchEntities(search: string,
   }
 
   const response = await apiRequest(wikidataEndpoint, params) as WBApiResult
-
-  return response.search!
+  const responseJson = `{
+    "searchinfo": {
+        "search": "CWE-129"
+    },
+    "search": [
+        {
+            "id": "C129",
+            "title": "CWE-129",
+            "url": "//www.wikidata.org/wiki/Q11572",
+            "concepturi": "http://www.wikidata.org/entity/Q11572",
+            "label": "Chleba s maslem a se salamem",
+            "description": "Jde chleba a povida chlebu s maslem AHA Ronaldo",
+            "match": {
+                "type": "label",
+                "language": "sk",
+                "text": "Trasiem sa ako Shakira v jej klipoch"
+            }
+        }
+    ],
+    "search-continue": 10,
+    "success": 0
+}`
+  const parsedResponse = JSON.parse(responseJson)
+  const result = parsedResponse as WBApiResult
+  return result.search!
 }
 
 export async function siteLinkUrls(entityId: EntityId) {
