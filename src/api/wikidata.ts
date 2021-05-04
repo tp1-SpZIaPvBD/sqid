@@ -190,11 +190,47 @@ export async function getEntityInfo(entityId: EntityId) {
 }
 
 export async function getEntityData(entityId: EntityId, lang?: string, fallback = true) {
-  const entities = await getEntities([entityId],
-                                     ['aliases', 'labels', 'descriptions', 'info',
-                                      'claims', 'datatype', 'sitelinks'],
-                                     lang,
-                                     fallback)
+  // const entities = await getEntities([entityId],
+  //                                    ['aliases', 'labels', 'descriptions', 'info',
+  //                                     'claims', 'datatype', 'sitelinks'],
+  //                                    lang,
+  //                                    fallback)
+  const obsoleteReadFallback = fallback
+  const obsoleteReadLang = lang
+
+  const jsonResponse = `
+  {
+    "warnings": {
+        "wbgetentities": {
+            "*": "Unrecognized value for parameter languages undefined"
+        }
+    },
+    "entities": {
+        "CVE-2001-0513": {
+            "type": "item",
+            "id": "CVE-2001-0513",
+            "labels": {
+                "en": {
+                    "language": "en",
+                    "value": "CVE-2001-0513"
+                }
+            },
+            "descriptions": {
+                "en": {
+                    "language": "en",
+                    "value": "Oracle listener process on Windows NT redirects connection requests to another port and creates a separate thread to process the request, which allows remote attackers to cause a denial of service by repeatedly connecting to the Oracle listener but not connecting to the redirected port."
+                }
+            },
+            "claims": {},
+            "aliases": {}
+        }
+    },
+    "success": 1
+}
+  `
+
+  const parsedResponse = JSON.parse(jsonResponse)
+  const entities = (parsedResponse as WBApiResult).entities!
 
   if ('missing' in entities[entityId]) {
     throw new EntityMissingError(entityId)
