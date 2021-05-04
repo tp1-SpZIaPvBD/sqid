@@ -13,13 +13,15 @@ export const ENTITY_PREFIX_LEN = ENTITY_PREFIX.length
 export const STATEMENT_PREFIX_LEN = STATEMENT_PREFIX.length
 
 function statementsFromBindings(bindings: SparqlBinding[]) {
+  const valueOfRank: Rank = 'preferred'
   return bindings.map((binding) => {
     // replace first '-' by '$' to obtain claim GUID
     return {
-      item: entityValue(binding.it),
-      statement: statementValue(binding.s).replace('-', '$'),
-      property: entityValue(binding.p),
-      rank: rankValue(binding.r),
+      item: entityValue(binding.item),
+      statement: statementValue(binding.statement).replace('-', '$'),
+      property: entityValue(binding.property),
+      //      rank: rankValue(binding.r),
+      rank: valueOfRank,
     }
   })
 }
@@ -40,11 +42,20 @@ function rankValue(binding: SparqlValue): Rank {
 }
 
 export function entityValue(binding: SparqlValue) {
-  return binding.value.slice(ENTITY_PREFIX_LEN)
+  //  return binding.value.slice(ENTITY_PREFIX_LEN)
+  if (binding) {
+    return binding.value
+  } else {
+      return ''
+  }
 }
 
 function statementValue(binding: SparqlValue) {
-  return binding.value.slice(STATEMENT_PREFIX_LEN)
+  if (binding) {
+    return binding.value.slice(STATEMENT_PREFIX_LEN)
+  } else {
+    return ''
+  }
 }
 
 export async function sparqlQuery(query: string): Promise<SparqlBinding[]> {
@@ -83,15 +94,15 @@ export async function getRelatedStatements(entityId: EntityId): Promise<SqidStat
 }
 
 async function getRelatingStatements(entityId: EntityId, limit: number):
-Promise<SqidStatement[]> {
-//   const result = await sparqlQuery(`SELECT DISTINCT ?it ?s ?p ?r WHERE {
-//   ?p wikibase:statementProperty ?ps ;
-//   wikibase:claim ?pc .
-//   ?s ?ps wd:${entityId} ;
-//     wikibase:rank ?r .
-//   ?it ?pc ?s .
-//   FILTER( ?p != <http://www.wikidata.org/entity/P31> )
-// } LIMIT ${limit}`)
+  Promise<SqidStatement[]> {
+  //   const result = await sparqlQuery(`SELECT DISTINCT ?it ?s ?p ?r WHERE {
+  //   ?p wikibase:statementProperty ?ps ;
+  //   wikibase:claim ?pc .
+  //   ?s ?ps wd:${entityId} ;
+  //     wikibase:rank ?r .
+  //   ?it ?pc ?s .
+  //   FILTER( ?p != <http://www.wikidata.org/entity/P31> )
+  // } LIMIT ${limit}`)
   const result = await sparqlQuery(`SELECT DISTINCT ?item ?statement ?entity ?r WHERE {
   cve:${entityId} ?property ?item .
   OPTIONAL { ?item rdfs:label ?statement . }
@@ -103,12 +114,12 @@ Promise<SqidStatement[]> {
 function relatingStatementsForPropertyQuery(entityId: EntityId,
                                             propertyId: EntityId,
                                             limit: number): string {
-// return `SELECT DISTINCT ?it ?s ?p ?r WHERE {
-// BIND(wd:${propertyId} AS ?p) .
-// ?s ps:${propertyId} wd:${entityId} ;
-//   wikibase:rank ?r .
-// ?it p:${propertyId} ?s .
-// } LIMIT ${limit}
+  // return `SELECT DISTINCT ?it ?s ?p ?r WHERE {
+  // BIND(wd:${propertyId} AS ?p) .
+  // ?s ps:${propertyId} wd:${entityId} ;
+  //   wikibase:rank ?r .
+  // ?it p:${propertyId} ?s .
+  // } LIMIT ${limit}
   return `SELECT DISTINCT ?item ?statement ?property WHERE {
   BIND(cve:${propertyId} AS ?property) .
   ?statement cve:${propertyId} cve:${entityId} ;
@@ -117,11 +128,11 @@ function relatingStatementsForPropertyQuery(entityId: EntityId,
 }
 
 async function getRelatingProperties(entityId: EntityId): Promise<EntityId[]> {
-//  const result = await sparqlQuery(`SELECT DISTINCT ?p {
-//  ?s ?ps wd:${entityId} .
-//  ?p wikibase:statementProperty ?ps .
-//  FILTER( ?p != <http://www.wikidata.org/entity/P31> )
-//  }`)
+  //  const result = await sparqlQuery(`SELECT DISTINCT ?p {
+  //  ?s ?ps wd:${entityId} .
+  //  ?p wikibase:statementProperty ?ps .
+  //  FILTER( ?p != <http://www.wikidata.org/entity/P31> )
+  //  }`)
   const result = await sparqlQuery(`SELECT DISTINCT ?property {
   cve:${entityId} ?property ?item .
   }`)
@@ -137,17 +148,17 @@ function propertySubjectsQuery(propertyId: EntityId,
                                limit?: number,
                                resultVariable = 'p'): string {
   const obj = (object
-               ? `cve:${object}`
-               : '[]')
+    ? `cve:${object}`
+    : '[]')
   const limitClause = limit ? ` LIMIT ${limit} ` : ''
   const tmpReferenceLangToRemoveError = lang
 
-//  return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {{
-//  SELECT DISTINCT ?${resultVariable} WHERE {
-//    ?${resultVariable} wdt:${propertyId} ${obj} .
-//  }${limitClause}}
-//  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
-//  }`
+  //  return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {{
+  //  SELECT DISTINCT ?${resultVariable} WHERE {
+  //    ?${resultVariable} wdt:${propertyId} ${obj} .
+  //  }${limitClause}}
+  //  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
+  //  }`
   return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {
     ?${resultVariable} cve:${propertyId} ${obj} .
     ?${resultVariable} rdfs:label ?${resultVariable}Label .
@@ -159,9 +170,10 @@ export async function getPropertySubjects(propertyId: EntityId, lang: string, li
   const result = await sparqlQuery(propertySubjectsQuery(propertyId, lang, entityId, limit))
 
   return result.map((binding) => {
-    return { entityId: entityValue(binding.p),
-             label: binding.pLabel.value,
-           }
+    return {
+      entityId: entityValue(binding.p),
+      label: binding.pLabel.value,
+    }
   })
 }
 
@@ -171,17 +183,17 @@ function propertyObjectsQuery(propertyId: EntityId,
                               limit?: number,
                               resultVariable = 'p'): string {
   const subj = (subject
-                ? `cve:${subject}`
-                : '[]')
+    ? `cve:${subject}`
+    : '[]')
   const limitClause = limit ? ` LIMIT ${limit} ` : ''
   const tmpReferenceLangToRemoveError = lang
 
-//  return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {{
-//  SELECT DISTINCT ?${resultVariable} WHERE {
-//    ${subj} wdt:${propertyId} ?${resultVariable} .
-//  }${limitClause}}
-//  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
-//  }`
+  //  return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {{
+  //  SELECT DISTINCT ?${resultVariable} WHERE {
+  //    ${subj} wdt:${propertyId} ?${resultVariable} .
+  //  }${limitClause}}
+  //  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
+  //  }`
   return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {
     ${subj} cve:${propertyId} ?${resultVariable} .
     ?${resultVariable} rdfs:label ?${resultVariable}Label .
@@ -193,8 +205,9 @@ export async function getPropertyObjects(propertyId: EntityId, lang: string, lim
   const result = await sparqlQuery(propertyObjectsQuery(propertyId, lang, entityId, limit))
 
   return result.map((binding) => {
-    return { entityId: entityValue(binding.p),
-             label: binding.pLabel.value,
-           }
+    return {
+      entityId: entityValue(binding.p),
+      label: binding.pLabel.value,
+    }
   })
 }
