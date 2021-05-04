@@ -169,9 +169,22 @@ export async function getEntityInfo(entityId: EntityId) {
   }
 
   const entities = await getEntities([entityId], ['info']) || []
+  const entityResponse = `
+  {
+    "entities": {
+        "Q11572": { }
+     },
+    "success": 1
+  }
+  `
+  // Parsujeme vlastnu entitu. Tu sa jedna hlavne o validaciu. Robi
+  // sa request na wikidata a pozerame, ci dane ID vobec existuje
+  const parsedResponse = JSON.parse(entityResponse)
+  const myEntities = (parsedResponse as WBApiResult).entities!
+  entityId = 'Q11572'
 
-  if (!(entityId in entities) ||
-      ('missing' in entities[entityId])) {
+  if (!(entityId in myEntities) ||
+      ('missing' in myEntities[entityId])) {
     throw new EntityMissingError(entityId)
   }
 }
@@ -213,12 +226,16 @@ export function parseEntityId(entityId: string): EntityReference {
   const id = parseInt(entityId.slice(1), 10)
   let kind = '' as EntityKind
 
+  if (entityId.startsWith('CVE')) {
+    kind = 'item'
+    return { id, kind }
+  }
+
   switch (prefix) {
     case 'P':
       kind = 'property'
       break
     case 'Q':
-    case 'C':
       kind = 'item'
       break
     case 'L':
