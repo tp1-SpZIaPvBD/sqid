@@ -14,12 +14,17 @@ export async function apiRequest(endpoint: string, query: any): Promise<ApiResul
 }
 
 export async function sparqlRequest(endpoint: string, query: string): Promise<SparqlResult> {
-  const response = await http.get(endpoint, {
-    params: {
-      format: 'json',
-      query,
-    },
-  })
+  // const response = await http.get(endpoint, {
+  //   params: {
+  //     format: 'json',
+  //     query,
+  //   },
+  // })
+
+  const params = new URLSearchParams()
+  params.append('format', 'json')
+  params.append('query', query)
+  const response = await http.post(endpoint, params)
 
   return response.data
 }
