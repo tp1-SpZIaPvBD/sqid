@@ -104,9 +104,12 @@ async function getRelatingStatements(entityId: EntityId, limit: number):
   //   FILTER( ?p != <http://www.wikidata.org/entity/P31> )
   // } LIMIT ${limit}`)
   const result = await sparqlQuery(`SELECT DISTINCT ?item ?statement ?entity ?r WHERE {
-  cve:${entityId} ?property ?item .
-  OPTIONAL { ?item rdfs:label ?statement . }
-} LIMIT ${limit}`)
+    cve:${entityId} ?property ?item .
+    ?property rdf:type owl:ObjectProperty .
+    BIND(str(?item) as ?statement) .
+    BIND(cve:${entityId} as ?entity) .
+    OPTIONAL {?item rdfs:label ?statement .} .
+  } LIMIT ${limit}`)
 
   return statementsFromBindings(result)
 }
