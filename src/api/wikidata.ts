@@ -221,7 +221,71 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
                     "value": "Oracle listener process on Windows NT redirects connection requests to another port and creates a separate thread to process the request, which allows remote attackers to cause a denial of service by repeatedly connecting to the Oracle listener but not connecting to the redirected port."
                 }
             },
-            "claims": {},
+            "claims": {
+                "Wtf": [
+                    {
+                        "mainsnak": {
+                            "snaktype": "value",
+                            "property": "P2031",
+                            "hash": "b04beefb2d5e75e0b67534d095c5357494460714",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+1992-05-25T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            },
+                            "datatype": "time"
+                        },
+                        "type": "statement",
+                        "id": "Q529207$0C4CB975-D572-4A04-A874-8BB2061D6CEE",
+                        "rank": "normal",
+                        "references": [
+                            {
+                                "hash": "5118319c3aa1c28aa0cd945d8ecf101bd8bb695e",
+                                "snaks": {
+                                    "P143": [
+                                        {
+                                            "snaktype": "value",
+                                            "property": "P143",
+                                            "hash": "e17507043402fe54ae6c4d65cc51f46cec987de9",
+                                            "datavalue": {
+                                                "value": {
+                                                    "entity-type": "item",
+                                                    "numeric-id": 8449,
+                                                    "id": "Q8449"
+                                                },
+                                                "type": "wikibase-entityid"
+                                            },
+                                            "datatype": "wikibase-item"
+                                        }
+                                    ],
+                                    "P4656": [
+                                        {
+                                            "snaktype": "value",
+                                            "property": "P4656",
+                                            "hash": "7d627b01468298611872bc7dd62c8c3fb6515148",
+                                            "datavalue": {
+                                                "value": "https://es.wikipedia.org/w/index.php?title=Ronaldo&oldid=118188376",
+                                                "type": "string"
+                                            },
+                                            "datatype": "url"
+                                        }
+                                    ]
+                                },
+                                "snaks-order": [
+                                    "P143",
+                                    "P4656"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
             "aliases": {}
         }
     },
