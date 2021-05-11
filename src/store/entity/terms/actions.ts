@@ -4,6 +4,7 @@ import { RootState } from '@/store/types'
 
 import { i18n } from '@/i18n'
 import { getLabels, getEntityData } from '@/api/wikidata'
+import { EntityId } from '@/api/types'
 
 export const actions: ActionTree<TermsState, RootState> = {
   async getLabel({ commit, getters }, opts: LabelOptions) {
@@ -57,12 +58,20 @@ export const actions: ActionTree<TermsState, RootState> = {
       return
     }
 
-    const promise = getLabels(missingLabels, lang || undefined)
-    commit('labelsRequested', {
-      entities: missingLabels,
-      lang,
-      promise,
-    })
+
+    // const promise = getLabels(missingLabels, lang || undefined)
+    // commit('labelsRequested', {
+    //   entities: missingLabels,
+    //   lang,
+    //   promise,
+    // })
+
+    const customLabels = new Map<string, Map<EntityId, string>>()
+    customLabels.set('en', new Map<EntityId,string>())
+    for (let i = 0; i < missingLabels.length; i++) {
+      customLabels.get('en')?.set(missingLabels[i], 'say whaaat')
+    }
+    commit('labelsLoaded', customLabels)
   },
   async getTerms({ commit, getters }, opts: LabelOptions) {
     const entityId = opts.entityId
