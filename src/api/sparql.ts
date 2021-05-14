@@ -77,7 +77,9 @@ export async function sparqlQueries(queries: string[]): Promise<SparqlBinding[][
 }
 
 export async function getRelatedStatements(entityId: EntityId): Promise<SqidStatement[]> {
-  const statements = await getRelatingStatements(entityId, MAX_RELATED_BATCH)
+  // TODO: when you want to work on this, replace 0 with MAX_RELATED_BATCH
+  // for now our version of SQID do not support working with related statements
+  const statements = await getRelatingStatements(entityId, 0)
 
   if (statements.length < MAX_RELATED_BATCH) {
     // got all related statements

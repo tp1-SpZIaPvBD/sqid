@@ -272,77 +272,77 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
   }
 }
 
-export function parseEntityId(entityId: string): EntityReference {
-  const prefix = entityId.slice(0, 1).toUpperCase()
-  const id = parseInt(entityId.slice(1), 10)
+export function parseEntityId(entityId: string) {
   let kind = '' as EntityKind
 
   if (entityId.startsWith('CVE')) {
     kind = 'item'
-    return { id, kind }
+  } else {
+    kind = 'property'
   }
 
-  switch (prefix) {
-    case 'P':
-      kind = 'property'
-      break
-    case 'Q':
-      kind = 'item'
-      break
-    case 'L':
-      kind = 'lexeme'
+  return { entityId, kind }
+  // switch (prefix) {
+  //   case 'P':
+  //     kind = 'property'
+  //     break
+  //   case 'Q':
+  //     kind = 'item'
+  //     break
+  //   case 'L':
+  //     kind = 'lexeme'
 
-      if (isNaN(id)) {
-        const [entity, sub] = entityId.slice(1).split('-')
+  //     if (isNaN(id)) {
+  //       const [entity, sub] = entityId.slice(1).split('-')
 
-        if (!entity || !sub) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
-        }
+  //       if (!entity || !sub) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
+  //       }
 
-        const subPrefix = sub.slice(0, 1).toUpperCase()
-        const subId = parseInt(sub.slice(1), 10)
-        const mainId = parseInt(entity, 10)
+  //       const subPrefix = sub.slice(0, 1).toUpperCase()
+  //       const subId = parseInt(sub.slice(1), 10)
+  //       const mainId = parseInt(entity, 10)
 
-        if (isNaN(mainId)) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entity}`)
-        }
+  //       if (isNaN(mainId)) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entity}`)
+  //       }
 
-        if (isNaN(subId)) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${sub.slice(1)}`)
-        }
+  //       if (isNaN(subId)) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${sub.slice(1)}`)
+  //       }
 
-        switch (subPrefix) {
-          case 'S':
-            kind = 'sense'
-            break
-          case 'F':
-            kind = 'form'
-            break
+  //       switch (subPrefix) {
+  //         case 'S':
+  //           kind = 'sense'
+  //           break
+  //         case 'F':
+  //           kind = 'form'
+  //           break
 
-          default:
-            throw new MalformedEntityIdError(entityId, `Unknown subPrefix ${subPrefix}`)
-        }
-        return {
-          id: mainId,
-          kind,
-          subId,
-        }
-      }
+  //         default:
+  //           throw new MalformedEntityIdError(entityId, `Unknown subPrefix ${subPrefix}`)
+  //       }
+  //       return {
+  //         id: mainId,
+  //         kind,
+  //         subId,
+  //       }
+  //     }
 
-      break
+  //     break
 
-    default:
-      throw new MalformedEntityIdError(entityId, `Unknown prefix ${prefix}`)
-  }
+  //   default:
+  //     throw new MalformedEntityIdError(entityId, `Unknown prefix ${prefix}`)
+  // }
 
-  if (isNaN(id)) {
-    throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
-  }
+  // if (isNaN(id)) {
+  //   throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
+  // }
 
-  return {
-    id,
-    kind,
-  }
+  // return {
+  //   id,
+  //   kind,
+  // }
 }
 
 export async function searchEntities(search: string,

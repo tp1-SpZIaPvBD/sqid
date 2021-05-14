@@ -171,7 +171,7 @@ Map<PropertyClassification, ClaimsMap> {
   }
 
   for (const [prop, claim] of sortedClaims.entries()) {
-    const kind = propertyGroups(prop)
+    const kind = propertyGroups(prop) || 'o'
     let group = groupedClaims.get(kind)
 
     if (group === undefined) {
