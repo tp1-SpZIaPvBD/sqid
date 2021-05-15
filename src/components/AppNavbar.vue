@@ -25,15 +25,15 @@ import AppNavbarLogin from './AppNavbarLogin.vue'
     components: {
         'app-navbar-search-box': AppNavbarSearchBox,
         'app-navbar-navlinks': AppNavbarNavlinks,
-        'app-navbar-login': AppNavbarLogin,
+//        'app-navbar-login': AppNavbarLogin,
     }})
 export default class AppNavbar extends Vue {
     private navlinks: Navlink[] = [
       { target: {name: 'home'}, message: 'pageTitle.start', exact: true },
-      { target: '/classes', message: 'pageTitle.classes' },
-      { target: '/properties', message: 'pageTitle.properties' },
+//      { target: '/classes', message: 'pageTitle.classes' },
+//      { target: '/properties', message: 'pageTitle.properties' },
 //      { target: '/lexemes', message: 'pageTitle.lexemes' },
-      { target: '/rules', message: 'pageTitle.rules' },
+//      { target: '/rules', message: 'pageTitle.rules' },
       { target: {name: 'about'}, message: 'pageTitle.about' },
     ]
 }
