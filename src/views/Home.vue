@@ -3,8 +3,8 @@
     <template v-slot:mainbar>
 	    <h1 v-t="'home.home'" />
       <i18n tag="p" path="home.description">
-        <a place="wikidata" href="https://www.wikidata.org">{{ $t('home.wikidata') }}</a>
-        <a place="reasonator" href="https://tools.wmflabs.org/reasonator/?">{{ $t('home.reasonator') }}</a>
+      </i18n>
+      <i18n tag="p" path="home.description2">
       </i18n>
 
     </template>

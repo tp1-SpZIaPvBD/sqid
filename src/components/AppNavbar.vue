@@ -2,7 +2,7 @@
   <b-navbar toggleable="lg" type="light" fill>
     <b-navbar-brand to="/">
       <img src="../assets/logo.svg" alt="SQID logo">
-      SQID
+      FEI-SQID
     </b-navbar-brand>
     <b-navbar-toggle target="mainNavbar" />
     <b-collapse is-nav id="mainNavbar">
