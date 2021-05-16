@@ -9,7 +9,7 @@
       <b-navbar-nav id="mainNavbar" class="justify-content-end flex-grow-1">
         <app-navbar-search-box class="w-25" />
         <app-navbar-navlinks :navlinks="navlinks" />
-        <app-navbar-login />
+        <!--<app-navbar-login />-->
       </b-navbar-nav>
     </b-collapse>
 </b-navbar>
@@ -19,7 +19,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import AppNavbarSearchBox from './AppNavbarSearchBox.vue'
 import { AppNavbarNavlinks, Navlink } from './AppNavbarNavlinks.vue'
-import AppNavbarLogin from './AppNavbarLogin.vue'
+// import AppNavbarLogin from './AppNavbarLogin.vue'
 
 @Component({
     components: {
