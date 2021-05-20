@@ -52,9 +52,9 @@ async function getEntityChunk(entityIds: string[],
                               lang?: string,
                               fallback = true): Promise<ResultList<EntityResult>> {
   const langCode = lang || i18n.locale
-  const response = await apiRequest(wikidataEndpoint, {
+  const response = await apiRequest(wikidataEndpoint + 'entity', {
     action: 'wbgetentities',
-    ids: entityIds.join('|'),
+    id: entityIds.join('|'),
     props: props.join('|'),
     languages: langCode,
     languagefallback: fallback,
@@ -354,10 +354,14 @@ export async function searchEntities(search: string,
                                        fallback?: boolean,
                                      }): Promise<ResultList<SearchResult>> {
   const langCode = options.lang || i18n.locale
+  // const params = {
+  //   action: 'wbsearchentities',
+  //   search,
+  //   language: langCode,
+  // } as any
+
   const params = {
-    action: 'wbsearchentities',
-    search,
-    language: langCode,
+    platform: search,
   } as any
 
   if (options.kind !== 'item') {
@@ -401,7 +405,7 @@ export async function searchEntities(search: string,
 }`
   const parsedResponse = JSON.parse(responseJson)
   const result = parsedResponse as WBApiResult
-  return result.search!
+  return response.search!
 }
 
 export async function siteLinkUrls(entityId: EntityId) {
