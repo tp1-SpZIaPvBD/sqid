@@ -59,19 +59,19 @@ export const actions: ActionTree<TermsState, RootState> = {
     }
 
 
-    // const promise = getLabels(missingLabels, lang || undefined)
-    // commit('labelsRequested', {
-    //   entities: missingLabels,
-    //   lang,
-    //   promise,
-    // })
+    const promise = getLabels(missingLabels, lang || undefined)
+    commit('labelsRequested', {
+      entities: missingLabels,
+      lang,
+      promise,
+    })
 
-    const customLabels = new Map<string, Map<EntityId, string>>()
-    customLabels.set('en', new Map<EntityId,string>())
-    for (let i = 0; i < missingLabels.length; i++) {
-      customLabels.get('en')?.set(missingLabels[i], 'say whaaat')
-    }
-    commit('labelsLoaded', customLabels)
+    // const customLabels = new Map<string, Map<EntityId, string>>()
+    // customLabels.set('en', new Map<EntityId,string>())
+    // for (let i = 0; i < missingLabels.length; i++) {
+    //   customLabels.get('en')?.set(missingLabels[i], 'say whaaat')
+    // }
+    // commit('labelsLoaded', customLabels)
   },
   async getTerms({ commit, getters }, opts: LabelOptions) {
     const entityId = opts.entityId

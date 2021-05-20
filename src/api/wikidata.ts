@@ -190,11 +190,11 @@ export async function getEntityInfo(entityId: EntityId) {
 }
 
 export async function getEntityData(entityId: EntityId, lang?: string, fallback = true) {
-  // const entities = await getEntities([entityId],
-  //                                    ['aliases', 'labels', 'descriptions', 'info',
-  //                                     'claims', 'datatype', 'sitelinks'],
-  //                                    lang,
-  //                                    fallback)
+  const entities = await getEntities([entityId],
+                                     ['aliases', 'labels', 'descriptions', 'info',
+                                      'claims', 'datatype', 'sitelinks'],
+                                     lang,
+                                     fallback)
   const obsoleteReadFallback = fallback
   const obsoleteReadLang = lang
 
@@ -245,7 +245,7 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
   `
 
   const parsedResponse = JSON.parse(jsonResponse)
-  const entities = (parsedResponse as WBApiResult).entities!
+  // const entities = (parsedResponse as WBApiResult).entities!
 
   if ('missing' in entities[entityId]) {
     throw new EntityMissingError(entityId)
@@ -275,7 +275,7 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
 export function parseEntityId(entityId: string) {
   let kind = '' as EntityKind
 
-  if (entityId.startsWith('CVE')) {
+  if (entityId.indexOf('CVE') >= 0) {
     kind = 'item'
   } else {
     kind = 'property'
@@ -380,7 +380,7 @@ export async function searchEntities(search: string,
     params.strictlanguage = true
   }
 
-  const response = await apiRequest(wikidataEndpoint, params) as WBApiResult
+  const response = await apiRequest(wikidataEndpoint, params, 'search') as WBApiResult
   const responseJson = `{
     "searchinfo": {
         "search": "CWE-129"
