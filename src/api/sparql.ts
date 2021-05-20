@@ -59,13 +59,10 @@ function statementValue(binding: SparqlValue) {
 }
 
 export async function sparqlQuery(query: string): Promise<SparqlBinding[]> {
-  const queryWithPrefix = `prefix cve: <https://cve.mitre.org/cgi-bin/cvename.cgi?name=>
-
-  ${query}`
   // const response = await sparqlRequest(sparqlEndpoint,
   //                                    `#TOOLSQID, https://tools.wmflabs.org/sqid/
   // ${queryWithPrefix}`)
-  const myResponse = await sparqlRequest(sparqlEndpoint, queryWithPrefix)
+  const myResponse = await sparqlRequest(sparqlEndpoint, query)
   return myResponse.results.bindings
 }
 
@@ -106,10 +103,10 @@ async function getRelatingStatements(entityId: EntityId, limit: number):
   //   FILTER( ?p != <http://www.wikidata.org/entity/P31> )
   // } LIMIT ${limit}`)
   const result = await sparqlQuery(`SELECT DISTINCT ?item ?statement ?entity ?r WHERE {
-    cve:${entityId} ?property ?item .
+    <${entityId}> ?property ?item .
     ?property rdf:type owl:ObjectProperty .
     BIND(str(?item) as ?statement) .
-    BIND(cve:${entityId} as ?entity) .
+    BIND(<${entityId}> as ?entity) .
     OPTIONAL {?item rdfs:label ?statement .} .
   } LIMIT ${limit}`)
 
@@ -126,9 +123,9 @@ function relatingStatementsForPropertyQuery(entityId: EntityId,
   // ?it p:${propertyId} ?s .
   // } LIMIT ${limit}
   return `SELECT DISTINCT ?item ?statement ?property WHERE {
-  BIND(cve:${propertyId} AS ?property) .
-  ?statement cve:${propertyId} cve:${entityId} ;
-  ?item cve:${propertyId} ?statement .
+  BIND(<${propertyId}> AS ?property) .
+  ?statement <${propertyId}> <${entityId}> ;
+  ?item <${propertyId}> ?statement .
   } LIMIT ${limit}`
 }
 
@@ -139,7 +136,7 @@ async function getRelatingProperties(entityId: EntityId): Promise<EntityId[]> {
   //  FILTER( ?p != <http://www.wikidata.org/entity/P31> )
   //  }`)
   const result = await sparqlQuery(`SELECT DISTINCT ?property {
-  cve:${entityId} ?property ?item .
+  <${entityId}> ?property ?item .
   }`)
 
   return result.map((binding) => {
@@ -153,7 +150,7 @@ function propertySubjectsQuery(propertyId: EntityId,
                                limit?: number,
                                resultVariable = 'p'): string {
   const obj = (object
-    ? `cve:${object}`
+    ? `<${object}>`
     : '[]')
   const limitClause = limit ? ` LIMIT ${limit} ` : ''
   const tmpReferenceLangToRemoveError = lang
@@ -165,7 +162,7 @@ function propertySubjectsQuery(propertyId: EntityId,
   //  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
   //  }`
   return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {
-    ?${resultVariable} cve:${propertyId} ${obj} .
+    ?${resultVariable} <${propertyId}> ${obj} .
     ?${resultVariable} rdfs:label ?${resultVariable}Label .
   }
   ${limitClause}`
@@ -188,7 +185,7 @@ function propertyObjectsQuery(propertyId: EntityId,
                               limit?: number,
                               resultVariable = 'p'): string {
   const subj = (subject
-    ? `cve:${subject}`
+    ? `<${subject}>`
     : '[]')
   const limitClause = limit ? ` LIMIT ${limit} ` : ''
   const tmpReferenceLangToRemoveError = lang
@@ -200,7 +197,7 @@ function propertyObjectsQuery(propertyId: EntityId,
   //  SERVICE wikibase:label { bd:serviceParam wikibase:language "${lang}" }
   //  }`
   return `SELECT ?${resultVariable} ?${resultVariable}Label WHERE {
-    ${subj} cve:${propertyId} ?${resultVariable} .
+    ${subj} <${propertyId}> ?${resultVariable} .
     ?${resultVariable} rdfs:label ?${resultVariable}Label .
   }
   ${limitClause}`
