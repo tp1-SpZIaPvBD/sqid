@@ -7,6 +7,15 @@
       <i18n tag="p" path="home.description2">
       </i18n>
 
+     <p>{{ $t('home.examples') }}
+        <ul>
+		      <li>Linux - returns vulnerabilities which affect Linux distros (e.g. <a href="http://147.175.121.153/entity/https:%2F%2Fcve.mitre.org%2Fcgi-bin%2Fcvename.cgi%3Fname=CVE-2002-0018">CVE-2002-0018</a>)</li>
+          <li>Windows - returns vulnerabilities which affect various Windows operating systems (e.g. <a href="http://147.175.121.153/entity/https:%2F%2Fcve.mitre.org%2Fcgi-bin%2Fcvename.cgi%3Fname=CVE-2005-0204">CVE-2005-0204</a>)</li>
+          <li>IBM - returns vulnerabilities which affect operating systems developed by IBM (e.g. <a href="http://147.175.121.153/entity/https:%2F%2Fcve.mitre.org%2Fcgi-bin%2Fcvename.cgi%3Fname=CVE-2011-1385">CVE-2011-1385</a>)</li>
+          <li>Solaris - returns vulnerabilities which affect various Solaris operating systems (e.g. <a href="http://147.175.121.153/entity/https:%2F%2Fcve.mitre.org%2Fcgi-bin%2Fcvename.cgi%3Fname=CVE-2002-0085">CVE-2002-0085</a>)</li>
+        </ul>
+      </p>
+
     </template>
     <template v-slot:sidebar>
       <sqid-image :file="'Cephalop.jpg'" :width="260" />
