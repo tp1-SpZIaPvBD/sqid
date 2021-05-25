@@ -551,8 +551,10 @@ export default class Entity extends Vue {
 
           this.getPropertyDatatypes(properties)
 
-          this.images = this.getImages(this.entityId)
-          this.banner = this.getBanner(this.entityId)
+          // this.images = this.getImages(this.entityId)
+          // this.banner = this.getBanner(this.entityId)
+          this.images = null
+          this.banner = null
 
           if (kind === 'property') {
             this.propertyDatatype = this.getPropertyDatatype(this.entityId) || null

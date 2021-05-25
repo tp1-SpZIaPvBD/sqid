@@ -52,9 +52,9 @@ async function getEntityChunk(entityIds: string[],
                               lang?: string,
                               fallback = true): Promise<ResultList<EntityResult>> {
   const langCode = lang || i18n.locale
-  const response = await apiRequest(wikidataEndpoint, {
+  const response = await apiRequest(wikidataEndpoint + 'entity', {
     action: 'wbgetentities',
-    ids: entityIds.join('|'),
+    id: entityIds.join('|'),
     props: props.join('|'),
     languages: langCode,
     languagefallback: fallback,
@@ -169,9 +169,22 @@ export async function getEntityInfo(entityId: EntityId) {
   }
 
   const entities = await getEntities([entityId], ['info']) || []
+  const entityResponse = `
+  {
+    "entities": {
+        "Q11572": { }
+     },
+    "success": 1
+  }
+  `
+  // Parsujeme vlastnu entitu. Tu sa jedna hlavne o validaciu. Robi
+  // sa request na wikidata a pozerame, ci dane ID vobec existuje
+  const parsedResponse = JSON.parse(entityResponse)
+  const myEntities = (parsedResponse as WBApiResult).entities!
+  entityId = 'Q11572'
 
-  if (!(entityId in entities) ||
-      ('missing' in entities[entityId])) {
+  if (!(entityId in myEntities) ||
+      ('missing' in myEntities[entityId])) {
     throw new EntityMissingError(entityId)
   }
 }
@@ -182,6 +195,57 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
                                       'claims', 'datatype', 'sitelinks'],
                                      lang,
                                      fallback)
+  const obsoleteReadFallback = fallback
+  const obsoleteReadLang = lang
+
+  const jsonResponse = `
+  {
+    "warnings": {
+        "wbgetentities": {
+            "*": "Unrecognized value for parameter languages undefined"
+        }
+    },
+    "entities": {
+        "CVE-2001-0513": {
+            "type": "item",
+            "id": "CVE-2001-0513",
+            "labels": {
+                "en": {
+                    "language": "en",
+                    "value": "CVE-2001-0513"
+                }
+            },
+            "descriptions": {
+                "en": {
+                    "language": "en",
+                    "value": "Oracle listener process on Windows NT redirects connection requests to another port and creates a separate thread to process the request, which allows remote attackers to cause a denial of service by repeatedly connecting to the Oracle listener but not connecting to the redirected port."
+                }
+            },
+            "claims": {
+                "P400": [
+                    {
+                        "mainsnak": {
+                            "snaktype": "value",
+                            "property": "P400",
+                            "datavalue": {
+                                "value": "Microsoft Exchange 2018",
+                                "type": "string"
+                            },
+                            "datatype": "quantity"
+                        },
+                        "type": "statement"
+                    }
+                ]
+            },
+            "aliases": {}
+        }
+    },
+    "success": 1
+}
+  `
+
+  const parsedResponse = JSON.parse(jsonResponse)
+  // const entities = (parsedResponse as WBApiResult).entities!
 
   if ('missing' in entities[entityId]) {
     throw new EntityMissingError(entityId)
@@ -208,72 +272,77 @@ export async function getEntityData(entityId: EntityId, lang?: string, fallback 
   }
 }
 
-export function parseEntityId(entityId: string): EntityReference {
-  const prefix = entityId.slice(0, 1).toUpperCase()
-  const id = parseInt(entityId.slice(1), 10)
+export function parseEntityId(entityId: string) {
   let kind = '' as EntityKind
 
-  switch (prefix) {
-    case 'P':
-      kind = 'property'
-      break
-    case 'Q':
-      kind = 'item'
-      break
-    case 'L':
-      kind = 'lexeme'
-
-      if (isNaN(id)) {
-        const [entity, sub] = entityId.slice(1).split('-')
-
-        if (!entity || !sub) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
-        }
-
-        const subPrefix = sub.slice(0, 1).toUpperCase()
-        const subId = parseInt(sub.slice(1), 10)
-        const mainId = parseInt(entity, 10)
-
-        if (isNaN(mainId)) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entity}`)
-        }
-
-        if (isNaN(subId)) {
-          throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${sub.slice(1)}`)
-        }
-
-        switch (subPrefix) {
-          case 'S':
-            kind = 'sense'
-            break
-          case 'F':
-            kind = 'form'
-            break
-
-          default:
-            throw new MalformedEntityIdError(entityId, `Unknown subPrefix ${subPrefix}`)
-        }
-        return {
-          id: mainId,
-          kind,
-          subId,
-        }
-      }
-
-      break
-
-    default:
-      throw new MalformedEntityIdError(entityId, `Unknown prefix ${prefix}`)
+  if (entityId.indexOf('CVE') >= 0) {
+    kind = 'item'
+  } else {
+    kind = 'property'
   }
 
-  if (isNaN(id)) {
-    throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
-  }
+  return { entityId, kind }
+  // switch (prefix) {
+  //   case 'P':
+  //     kind = 'property'
+  //     break
+  //   case 'Q':
+  //     kind = 'item'
+  //     break
+  //   case 'L':
+  //     kind = 'lexeme'
 
-  return {
-    id,
-    kind,
-  }
+  //     if (isNaN(id)) {
+  //       const [entity, sub] = entityId.slice(1).split('-')
+
+  //       if (!entity || !sub) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
+  //       }
+
+  //       const subPrefix = sub.slice(0, 1).toUpperCase()
+  //       const subId = parseInt(sub.slice(1), 10)
+  //       const mainId = parseInt(entity, 10)
+
+  //       if (isNaN(mainId)) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entity}`)
+  //       }
+
+  //       if (isNaN(subId)) {
+  //         throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${sub.slice(1)}`)
+  //       }
+
+  //       switch (subPrefix) {
+  //         case 'S':
+  //           kind = 'sense'
+  //           break
+  //         case 'F':
+  //           kind = 'form'
+  //           break
+
+  //         default:
+  //           throw new MalformedEntityIdError(entityId, `Unknown subPrefix ${subPrefix}`)
+  //       }
+  //       return {
+  //         id: mainId,
+  //         kind,
+  //         subId,
+  //       }
+  //     }
+
+  //     break
+
+  //   default:
+  //     throw new MalformedEntityIdError(entityId, `Unknown prefix ${prefix}`)
+  // }
+
+  // if (isNaN(id)) {
+  //   throw new MalformedEntityIdError(entityId, `Ill-formed numeric part ${entityId.slice(1)}`)
+  // }
+
+  // return {
+  //   id,
+  //   kind,
+  // }
 }
 
 export async function searchEntities(search: string,
@@ -285,10 +354,14 @@ export async function searchEntities(search: string,
                                        fallback?: boolean,
                                      }): Promise<ResultList<SearchResult>> {
   const langCode = options.lang || i18n.locale
+  // const params = {
+  //   action: 'wbsearchentities',
+  //   search,
+  //   language: langCode,
+  // } as any
+
   const params = {
-    action: 'wbsearchentities',
-    search,
-    language: langCode,
+    platform: search,
   } as any
 
   if (options.kind !== 'item') {
@@ -307,8 +380,31 @@ export async function searchEntities(search: string,
     params.strictlanguage = true
   }
 
-  const response = await apiRequest(wikidataEndpoint, params) as WBApiResult
-
+  const response = await apiRequest(wikidataEndpoint, params, 'search') as WBApiResult
+  const responseJson = `{
+    "searchinfo": {
+        "search": "CWE-129"
+    },
+    "search": [
+        {
+            "id": "C129",
+            "title": "CWE-129",
+            "url": "//www.wikidata.org/wiki/Q11572",
+            "concepturi": "http://www.wikidata.org/entity/Q11572",
+            "label": "Chleba s maslem a se salamem",
+            "description": "Jde chleba a povida chlebu s maslem AHA Ronaldo",
+            "match": {
+                "type": "label",
+                "language": "sk",
+                "text": "Trasiem sa ako Shakira v jej klipoch"
+            }
+        }
+    ],
+    "search-continue": 10,
+    "success": 0
+}`
+  const parsedResponse = JSON.parse(responseJson)
+  const result = parsedResponse as WBApiResult
   return response.search!
 }
 

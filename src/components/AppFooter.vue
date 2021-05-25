@@ -13,7 +13,7 @@
             <a href="https://query.wikidata.org/">Wikidata SPARQL Query</a>
           </p>
           <i18n path="footer.sourceCode" tag="p">
-            <a href="https://github.com/Wikidata/SQID">Github</a>
+            <a href="https://github.com/tp1-SpZIaPvBD/sqid">Github</a>
           </i18n>
         </div>
       </div>

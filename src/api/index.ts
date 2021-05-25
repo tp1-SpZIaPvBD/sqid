@@ -1,8 +1,8 @@
 import { http } from '@/http'
 import { ApiResult, SparqlResult } from './types'
 
-export async function apiRequest(endpoint: string, query: any): Promise<ApiResult> {
-  const response = await http.get(endpoint, {
+export async function apiRequest(endpoint: string, query: any, suffix: string = ''): Promise<ApiResult> {
+  const response = await http.get(endpoint + suffix, {
     params: {
       format: 'json',
       origin: '*',
@@ -20,6 +20,11 @@ export async function sparqlRequest(endpoint: string, query: string): Promise<Sp
       query,
     },
   })
+
+  // const params = new URLSearchParams()
+  // params.append('format', 'json')
+  // params.append('query', query)
+  // const response = await http.post(endpoint, params)
 
   return response.data
 }

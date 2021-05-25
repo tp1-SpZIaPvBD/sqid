@@ -75,8 +75,13 @@ export interface RelatednessScores {
 }
 
 export function getChunkId(entityId: EntityId, chunkSize: number) {
-  const { id } = parseEntityId(entityId)
-  return Math.floor(id / chunkSize)
+  const id = parseEntityId(entityId)
+  // TODO: this is just temporary. Usually this number was parsed from
+  // wikidata entity ID, but our IDs dont have to have any number in
+  // their ID. This will require additional effort to find better
+  // workaround
+  const idNum = 100
+  return Math.floor(idNum / chunkSize)
 }
 
 export async function getRelatedPropertiesChunk(chunkId: number, lastRefresh: number) {
@@ -171,7 +176,7 @@ Map<PropertyClassification, ClaimsMap> {
   }
 
   for (const [prop, claim] of sortedClaims.entries()) {
-    const kind = propertyGroups(prop)
+    const kind = propertyGroups(prop) || 'o'
     let group = groupedClaims.get(kind)
 
     if (group === undefined) {
