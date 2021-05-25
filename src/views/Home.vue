@@ -16,6 +16,16 @@
         </ul>
       </p>
 
+      <!-- TODO -->
+      <!-- <p>{{ $t('home.examples') }}
+        <ul>
+		      <i18n tag="li" path="home.examplesLinux"><entity-link place="linux" entityId="#" /></i18n>
+          <i18n tag="li" path="home.exampWindows"><entity-link place="windows" entityId="#" /></i18n>
+          <i18n tag="li" path="home.examplesIBM"><entity-link place="ibm" entityId="#" /></i18n>
+          <i18n tag="li" path="home.examplesSolaris"><entity-link place="solaris" entityId="#" /></i18n>
+        </ul>
+      </p> -->
+
     </template>
     <template v-slot:sidebar>
       <sqid-image :file="'Cephalop.jpg'" :width="260" />
