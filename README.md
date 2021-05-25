@@ -1,4 +1,4 @@
-# SQID
+# FEI-SQID
 (a.k.a. Wikidata Class Browser)
 
 ## Installation
